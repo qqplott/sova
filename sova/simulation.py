@@ -14,21 +14,25 @@ class HedgeSimulation:
         self.portfolio = portfolio
 
     def _make_result_dt_row(self, curr_mkt_time: dt.datetime, curr_mkt: pd.Series) -> Dict:
-        hedge_deposit, hedge_asset = self.portfolio.hedge_delta(curr_mkt.asset_price,
-                                                                curr_mkt_time,
-                                                                curr_mkt.risk_free_rate)
         curr_pv = self.portfolio.current_price(curr_mkt.asset_price,
                                                curr_mkt_time,
                                                curr_mkt.risk_free_rate)
         curr_delta = self.portfolio.current_delta(curr_mkt.asset_price,
                                                   curr_mkt_time,
                                                   curr_mkt.risk_free_rate)
+        hedge_deposit, hedge_asset = self.portfolio.hedge_delta(curr_mkt.asset_price,
+                                                                curr_mkt_time,
+                                                                curr_mkt.risk_free_rate)
+        hedged_delta = self.portfolio.current_delta(curr_mkt.asset_price,
+                                                    curr_mkt_time,
+                                                    curr_mkt.risk_free_rate)
         return {
             'asset_price': curr_mkt.asset_price,
             'porfolio_pv': curr_pv,
             'portfolio_delta': curr_delta,
-            'hedge_asset_amount': hedge_asset.asset.amount,
-            'hedge_deposit_amount': hedge_deposit.asset.amount
+            'portfolio_hedged_delta': hedged_delta,
+            'hedge_asset_amount': hedge_asset.amount,
+            'hedge_deposit_amount': hedge_deposit.amount
         }
 
     def run_simulation(self, market_data: Optional[pd.DataFrame] = None) -> pd.DataFrame:
@@ -41,8 +45,8 @@ class HedgeSimulation:
 
         if self.portfolio is None:
             opt = StockOption(amount=1,
-                              expiry=curr_mkt_time,
-                              strike=curr_mkt.asset_price * curr_mkt.risk_free_rate)
+                              expiry=market_data.index[-1].to_pydatetime(),
+                              strike=curr_mkt.asset_price / np.exp(-curr_mkt.risk_free_rate))
             initial_assets = [opt]
             self.portfolio = Portfolio(list(map(lambda a: Trade(curr_mkt_time, curr_mkt.asset_price, a),
                                                 initial_assets)))

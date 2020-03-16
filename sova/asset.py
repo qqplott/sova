@@ -25,7 +25,7 @@ class AbstractAsset(ABC):
         raise NotImplementedError
 
     def __str__(self):
-        return f'{str(type(self))}(amount={self.amount})'
+        return f'{str(type(self).__name__)}(amount={self.amount})'
 
     def __repr__(self):
         return self.__str__()

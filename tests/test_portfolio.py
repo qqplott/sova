@@ -81,4 +81,4 @@ def test_portfolio_hedges_has_corresponding_amounts(mult):
     portfolio = Portfolio(trades=n * trades)
     deposit_hedge, stock_hedge = portfolio.hedge_delta(stock_price, market_time)
 
-    assert pytest.approx(-1 * deposit_hedge.asset.amount / stock_price, precision) == stock_hedge.asset.amount
+    assert pytest.approx(-1 * deposit_hedge.amount / stock_price, precision) == stock_hedge.amount

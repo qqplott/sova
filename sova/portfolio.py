@@ -1,6 +1,6 @@
 import datetime as dt
 from dataclasses import dataclass
-from typing import List, Tuple, Callable
+from typing import List, Tuple, Callable, Optional
 
 from sova.asset import AbstractAsset, Deposit, Stock
 
@@ -13,8 +13,9 @@ class Trade:
 
 
 class Portfolio:
-    def __init__(self, trades: List[Trade]):
+    def __init__(self, trades: List[Trade], delta_threshold: float = .005):
         self.trades = trades
+        self.delta_threshold = delta_threshold
 
     def trade(self, trade_time: dt.datetime, stock_price: float, asset: AbstractAsset):
         self.trades.append(Trade(trade_time, stock_price, asset))
@@ -41,14 +42,17 @@ class Portfolio:
     def hedge_delta(self,
                     stock_price: float,
                     market_time: dt.datetime,
-                    risk_free_rate: float = .01) -> Tuple[Trade, Trade]:
+                    risk_free_rate: float = .01) -> Optional[Tuple[AbstractAsset, AbstractAsset]]:
         delta = self.current_delta(stock_price, market_time, risk_free_rate)
-        hedge_deposit = Trade(trade_time=market_time,
-                              stock_price=stock_price,
-                              asset=Deposit(delta * stock_price))
-        hedge_asset = Trade(trade_time=market_time,
-                            stock_price=stock_price,
-                            asset=Stock(-1 * delta))
-        self.trades.append(hedge_deposit)
-        self.trades.append(hedge_asset)
-        return hedge_deposit, hedge_asset
+        if abs(delta) > self.delta_threshold:
+            hedge_deposit = Trade(trade_time=market_time,
+                                  stock_price=stock_price,
+                                  asset=Deposit(delta * stock_price))
+            hedge_asset = Trade(trade_time=market_time,
+                                stock_price=stock_price,
+                                asset=Stock(-1 * delta))
+            self.trades.append(hedge_deposit)
+            self.trades.append(hedge_asset)
+            return hedge_deposit.asset, hedge_asset.asset
+
+        return Deposit(0), Stock(0)
