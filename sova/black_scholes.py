@@ -2,32 +2,11 @@ from enum import Enum
 
 import numpy as np
 import scipy.stats as ss
-import sympy as sy
-from sympy.stats import Normal, cdf
 
 
 class OptionType(Enum):
     CALL = 1
     PUT = -1
-
-
-def put_option_price_sym(S, K, T, r, sigma):
-    # S: spot price
-    # K: strike price
-    # T: time to maturity
-    # r: interest rate
-    # sigma: volatility of underlying asset
-
-    N = Normal('x', 0.0, 1.0)
-
-    S = float(S)
-
-    d1 = (sy.ln(S / K) + (r + 0.5 * sigma ** 2) * T) / (sigma * sy.sqrt(T))
-    d2 = (sy.ln(S / K) + (r - 0.5 * sigma ** 2) * T) / (sigma * sy.sqrt(T))
-
-    put_price = K * sy.exp(-r * T) * cdf(N)(-d2) - S * cdf(N)(-d1)
-
-    return put_price
 
 
 def black_scholes_price(payoff: OptionType,
