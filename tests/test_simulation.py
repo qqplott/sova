@@ -1,7 +1,7 @@
 import numpy as np
 
-from market_data import generate_market_data
-from simulation import HedgeSimulation
+from sova.market_data import generate_market_data
+from sova.simulation import HedgeSimulation
 
 
 def test_simulation():

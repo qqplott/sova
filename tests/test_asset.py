@@ -4,8 +4,8 @@ from itertools import product
 import numpy as np
 import pytest
 
-from asset import StockOption, Stock, Deposit
-from black_scholes import OptionType
+from sova.asset import StockOption, Stock, Deposit
+from sova.black_scholes import OptionType
 
 precision = 1e-5
 

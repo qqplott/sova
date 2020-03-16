@@ -2,9 +2,9 @@ import datetime as dt
 
 import pytest
 
-from asset import StockOption, Deposit, Stock
-from black_scholes import OptionType
-from portfolio import Portfolio, Trade
+from sova.asset import StockOption, Deposit, Stock
+from sova.black_scholes import OptionType
+from sova.portfolio import Portfolio, Trade
 
 precision = 1e-5
 
